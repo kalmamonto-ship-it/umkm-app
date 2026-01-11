@@ -1,0 +1,38 @@
+{
+  "name": "UMKM App",
+  "description": "Laravel 12 UMKM Application",
+  "repository": "https://github.com/kalmamonto-ship-it/umkm-app",
+  "logo": "https://laravel.com/img/logomark.min.svg",
+  "keywords": ["laravel", "php", "ecommerce", "umkm"],
+  "env": {
+    "APP_NAME": {
+      "description": "The application name.",
+      "value": "UMKM App"
+    },
+    "APP_ENV": {
+      "description": "The application environment.",
+      "value": "production"
+    },
+    "APP_KEY": {
+      "description": "The application key.",
+      "generator": "secret"
+    },
+    "APP_DEBUG": {
+      "description": "Enable or disable debug mode.",
+      "value": "false"
+    },
+    "DB_CONNECTION": {
+      "description": "Database driver",
+      "value": "sqlite"
+    }
+  },
+  "scripts": {
+    "postdeploy": "php artisan migrate --force"
+  },
+  "addons": [],
+  "buildpacks": [
+    {
+      "url": "https://github.com/heroku/heroku-buildpack-php"
+    }
+  ]
+}
