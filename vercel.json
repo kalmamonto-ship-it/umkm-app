@@ -1,8 +1,6 @@
 {
   "version": 2,
-  "functions": {
-    "public/index.php": {
-      "runtime": "vercel-php"
-    }
-  }
+  "buildCommand": "npm install && npm run vercel-build && composer install",
+  "outputDirectory": ".",
+  "installCommand": "npm install && composer install"
 }
