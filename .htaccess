@@ -13,3 +13,9 @@ RewriteRule ^ index.php [L]
 # Handle Authorization Header
 RewriteCond %{HTTP:Authorization} .
 RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+
+# Increase memory limit
+php_value memory_limit 256M
+php_value upload_max_filesize 64M
+php_value post_max_size 64M
+php_value max_execution_time 300

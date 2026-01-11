@@ -1,0 +1,55 @@
+# Panduan Deploy ke InfinityFree
+
+## 1. Registrasi Akun
+- Buka https://www.infinityfree.net/
+- Klik "Sign Up"
+- Isi formulir dengan:
+  - Username: pilih nama unik
+  - Email: alamat email Anda
+  - Password: password Anda
+- Verifikasi email Anda
+
+## 2. Dapatkan Subdomain
+- Setelah login, Anda akan mendapatkan subdomain gratis (misalnya: namakamu.infinityfreeapp.com)
+
+## 3. Upload File Aplikasi
+### Pilihan A: Menggunakan File Manager InfinityFree
+1. Login ke control panel InfinityFree
+2. Gunakan File Manager untuk upload file-file aplikasi Laravel
+3. Upload semua file ke direktori utama (htdocs/www)
+
+### Pilihan B: Menggunakan FTP
+1. Dapatkan detail FTP dari control panel InfinityFree
+2. Gunakan FTP client (FileZilla, WinSCP, dll)
+3. Upload semua file ke direktori root
+
+## 4. Install Dependencies
+1. Gunakan SSH terminal (jika tersedia di InfinityFree)
+2. Atau gunakan File Manager untuk menjalankan perintah:
+   - composer install
+   - npm install
+   - npm run build
+
+## 5. Konfigurasi Database
+1. Buat database MySQL gratis di InfinityFree
+2. Update file .env dengan detail database:
+   - DB_CONNECTION=mysql
+   - DB_HOST=localhost
+   - DB_PORT=3306
+   - DB_DATABASE=nama_database_anda
+   - DB_USERNAME=username_mysql_anda
+   - DB_PASSWORD=password_mysql_anda
+
+## 6. Jalankan Migration
+- php artisan migrate --force
+
+## 7. Atur Permissions
+- Pastikan folder berikut dapat ditulis:
+  - storage/
+  - bootstrap/cache/
+
+## Catatan Penting:
+- InfinityFree memiliki keterbatasan resource
+- Aplikasi mungkin lambat saat pertama kali diakses (karena sleep mode)
+- Fitur premium tersedia untuk performa lebih baik
+- Beberapa fitur Laravel mungkin terbatas tergantung plan yang digunakan
