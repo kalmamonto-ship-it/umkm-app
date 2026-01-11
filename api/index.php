@@ -36,12 +36,20 @@ if (!is_dir(__DIR__.'/../bootstrap/cache')) {
     mkdir(__DIR__.'/../bootstrap/cache', 0755, true);
 }
 
-// Ensure SQLite database exists
-$dbPath = __DIR__ . '/../database/database.sqlite';
+// Ensure SQLite database exists in a writable location
+$dbPath = '/tmp/database.sqlite';
 if (!file_exists($dbPath)) {
     // Create the database file
     touch($dbPath);
     chmod($dbPath, 0664);
+}
+
+// Also ensure local database exists as backup
+$localDbPath = __DIR__ . '/../database/database.sqlite';
+if (!file_exists($localDbPath)) {
+    // Create the database file
+    touch($localDbPath);
+    chmod($localDbPath, 0664);
 }
 
 // Check maintenance mode
