@@ -1,87 +1,87 @@
 <?php
 
-/**
- * Vercel + Laravel Entry Point
- * 
- * This file serves as the entry point for Vercel deployments.
- */
-
-// For Vercel, ensure that the public directory is properly served
-// and that the build directory is available in the expected location
-if (isset($_ENV['VERCEL'])) {
-    // Ensure public directory exists and is accessible
-    if (!file_exists(__DIR__ . '/../public')) {
-        mkdir(__DIR__ . '/../public', 0755, true);
-    }
-    
-    // Ensure the build directory exists in public
-    if (!file_exists(__DIR__ . '/../public/build')) {
-        mkdir(__DIR__ . '/../public/build', 0755, true);
-    }
-    
-    // Create a fallback dist directory that Vercel looks for
-    if (!file_exists(__DIR__ . '/../dist')) {
-        // Create symlink or copy if possible
-        if (function_exists('symlink') && is_writable(__DIR__ . '/..')) {
-            @symlink(__DIR__ . '/../public/build', __DIR__ . '/../dist');
-        } else {
-            // Create a simple dist directory with a placeholder if symlink fails
-            mkdir(__DIR__ . '/../dist', 0755, true);
-            file_put_contents(__DIR__ . '/../dist/.gitkeep', '');
-        }
-    }
-}
-
-// Ensure the application can write to necessary directories
-if (!is_dir(__DIR__.'/../bootstrap/cache')) {
-    mkdir(__DIR__.'/../bootstrap/cache', 0755, true);
-}
-
-// For Vercel environment, ensure we're in production mode
-if (isset($_ENV['VERCEL'])) {
-    putenv('APP_ENV=production');
-    $_ENV['APP_ENV'] = 'production';
-    $_SERVER['APP_ENV'] = 'production';
-    
-    // Set other important environment variables
-    putenv('APP_DEBUG=false');
-    $_ENV['APP_DEBUG'] = 'false';
-    $_SERVER['APP_DEBUG'] = 'false';
-    
-    // Ensure database settings are appropriate for Vercel
-    putenv('DB_CONNECTION=sqlite');
-    $_ENV['DB_CONNECTION'] = 'sqlite';
-    $_SERVER['DB_CONNECTION'] = 'sqlite';
-}
-
 use Illuminate\Http\Request;
 
 define('LARAVEL_START', microtime(true));
 
-// Check if the application is under maintenance
+// For Vercel, ensure directories exist
+if (!is_dir(__DIR__.'/../storage')) {
+    mkdir(__DIR__.'/../storage', 0755, true);
+}
+if (!is_dir(__DIR__.'/../storage/logs')) {
+    mkdir(__DIR__.'/../storage/logs', 0755, true);
+}
+if (!is_dir(__DIR__.'/../storage/framework')) {
+    mkdir(__DIR__.'/../storage/framework', 0755, true);
+}
+if (!is_dir(__DIR__.'/../storage/framework/cache')) {
+    mkdir(__DIR__.'/../storage/framework/cache', 0755, true);
+}
+if (!is_dir(__DIR__.'/../storage/framework/sessions')) {
+    mkdir(__DIR__.'/../storage/framework/sessions', 0755, true);
+}
+if (!is_dir(__DIR__.'/../storage/framework/views')) {
+    mkdir(__DIR__.'/../storage/framework/views', 0755, true);
+}
+if (!is_dir(__DIR__.'/../storage/framework/testing')) {
+    mkdir(__DIR__.'/../storage/framework/testing', 0755, true);
+}
+if (!is_dir(__DIR__.'/../bootstrap/cache')) {
+    mkdir(__DIR__.'/../bootstrap/cache', 0755, true);
+}
+
+// Check maintenance mode
 if (file_exists($maintenance = __DIR__.'/../storage/framework/maintenance.php')) {
     require $maintenance;
 }
 
-// Register the auto loader
+// Register autoloader
 require __DIR__.'/../vendor/autoload.php';
 
-// Run the application
+// For Vercel environment, ensure production mode
+if (isset($_ENV['VERCEL'])) {
+    // Set environment variables
+    if (!isset($_ENV['APP_KEY']) && isset($_SERVER['APP_KEY'])) {
+        $_ENV['APP_KEY'] = $_SERVER['APP_KEY'];
+    }
+    if (!isset($_ENV['APP_ENV']) && isset($_SERVER['APP_ENV'])) {
+        $_ENV['APP_ENV'] = $_SERVER['APP_ENV'];
+    }
+    if (!isset($_ENV['APP_DEBUG']) && isset($_SERVER['APP_DEBUG'])) {
+        $_ENV['APP_DEBUG'] = $_SERVER['APP_DEBUG'];
+    }
+    if (!isset($_ENV['DB_CONNECTION']) && isset($_SERVER['DB_CONNECTION'])) {
+        $_ENV['DB_CONNECTION'] = $_SERVER['DB_CONNECTION'];
+    }
+    if (!isset($_ENV['DB_DATABASE']) && isset($_SERVER['DB_DATABASE'])) {
+        $_ENV['DB_DATABASE'] = $_SERVER['DB_DATABASE'];
+    }
+}
+
+// Create application
 $app = require_once __DIR__.'/../bootstrap/app.php';
 
-// For Vercel, we need to handle static assets before routing through Laravel
+if (isset($_ENV['VERCEL'])) {
+    $app->useEnvironmentPath(__DIR__.'/..');
+    $app->detectEnvironment(function () {
+        return 'production';
+    });
+}
+
+$kernel = $app->make(Illuminate\Contracts\Http\Kernel::class);
+
+// Handle static assets first
 $uri = urldecode(
     parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH) ?? ''
 );
 
-// Handle static assets directly
-if ($uri !== '/' && file_exists(__DIR__.'/../public'.$uri)) {
+// Serve static files directly if they exist
+if ($uri !== '/' && $uri !== '/index.php' && file_exists(__DIR__.'/../public'.$uri)) {
     return false;
 }
 
-// Capture the request and send it through Laravel
+// Capture and handle request
 $request = Request::capture();
-$kernel = $app->make(Illuminate\Contracts\Http\Kernel::class);
 $response = $kernel->handle($request);
 $response->send();
 $kernel->terminate($request, $response);
