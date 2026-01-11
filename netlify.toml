@@ -1,0 +1,24 @@
+[build]
+  command = "npm run build && composer install"
+  publish = "public"
+  functions = "netlify/functions"
+
+[build.environment]
+  PHP_VERSION = "8.2"
+  COMPOSER_VERSION = "2.5.8"
+  NODE_VERSION = "18"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.php"
+  status = 200
+
+[[headers]]
+  for = "/build/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/img/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000"
