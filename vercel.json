@@ -1,6 +1,19 @@
 {
   "version": 2,
-  "buildCommand": "npm install && npm run vercel-build && composer install",
-  "outputDirectory": ".",
-  "installCommand": "npm install && composer install"
+  "builds": [
+    {
+      "src": "public/index.php",
+      "use": "vercel-php"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/build/(.*)",
+      "dest": "/public/build/$1"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/public/index.php"
+    }
+  ]
 }
