@@ -4,6 +4,11 @@ use Illuminate\Http\Request;
 
 define('LARAVEL_START', microtime(true));
 
+// Load InfinityFree specific configuration
+if (file_exists(__DIR__.'/infinityfree-config.php')) {
+    require_once __DIR__.'/infinityfree-config.php';
+}
+
 // Set environment for InfinityFree
 if (!isset($_ENV['APP_ENV'])) {
     $_ENV['APP_ENV'] = 'production';
